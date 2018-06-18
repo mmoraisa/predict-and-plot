@@ -1,0 +1,46 @@
+h1 {
+    margin: 15px 15px 25px 15px;
+    padding: 0 15px;
+    font-family: 'Rancho', cursive;
+    font-weight: 400;
+    text-align: right;
+    color: #254251;
+    text-shadow: 1px 1px 3px rgba(0,0,0,.15);
+}
+
+.content {
+    display: flex;
+}
+
+.content > section {
+    margin: 10px;
+}
+
+.content > .series {
+    flex: 1;
+}
+
+.content > .function {
+    flex: 4;
+    background-color: green;
+}
+
+@media screen and (max-width: 768px) {
+
+    .content {
+        flex-direction: column;
+    }
+
+}
+
+@media screen and (max-width: 480px) {
+
+    h1 {
+        margin: 1% 1% 1.75% 1%;
+    }
+
+    .content > section {
+        margin: 1%;
+    }
+
+}
