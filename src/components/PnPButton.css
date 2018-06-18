@@ -1,0 +1,26 @@
+.pnp-button {
+    display: inline-block;
+    font-family: 'Ropa Sans', sans-serif;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px rgba(0,0,0,.5);
+    background: linear-gradient(127deg, #0F2027, #203A43, #2C5364);
+    transition: 1s all ease;
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+.pnp-button:hover {
+    background: linear-gradient(127deg, #274B5A, #305764, #396B81);
+}
+
+.pnp-button:disabled {
+    background: linear-gradient(127deg, #395058, #3E5861, #537888);
+    pointer-events: none;
+}

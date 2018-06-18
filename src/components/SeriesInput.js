@@ -3,11 +3,22 @@ import './SeriesInput.css'
 
 class SeriesInput extends Component {
 
+    handleOnChangeSeries = evt => {
+        const { onChangeSeries } = this.props
+        let val = evt.target.value
+
+        try {
+            val = JSON.parse(val)
+            onChangeSeries(val)
+        } catch(e) {}
+    }
+
     render () {
 
         const {
             name,
-            placeholder = []
+            placeholder = [],
+            onChangeSeries = () => {}
         } = this.props
 
         return (
@@ -18,6 +29,7 @@ class SeriesInput extends Component {
                         ref={ ref => this.inputSeries = ref }
                         type="text"
                         defaultValue={ `[${ placeholder.join(',') }]` }
+                        onChange={ this.handleOnChangeSeries }
                     />
                 </div>
             </div>

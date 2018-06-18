@@ -20,9 +20,25 @@ h1 {
     flex: 1;
 }
 
+.content > .series > .series-action {
+    display: flex;
+    align-items: center;
+}
+
+.content > .series > .series-action > img {
+    opacity: 0;
+    width: 34px;
+    margin-left: 10px;
+    transition: .25s all ease;
+}
+
+.content > .series > .series-action.loading > img {
+    opacity: 1;
+    transition: .25s all ease;
+}
+
 .content > .function {
     flex: 4;
-    background-color: green;
 }
 
 @media screen and (max-width: 768px) {
