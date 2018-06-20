@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import './Main.css'
 
 import { predict, train } from '../helpers/Intelligence'
+import { delay } from '../helpers/Utility'
 
 import SeriesInput from '../components/SeriesInput'
 import Button from '../components/PnPButton'
@@ -17,9 +18,10 @@ class Main extends Component{
         predictionData: [],
         seriesX: [],
         seriesY: [],
-        seriesXForPrediction: [],
+        seriesXForPrediction: [1,6],
         seriesYForPrediction: [],
-        training: false
+        training: false,
+        trainingLoop: 0
     }
 
     componentDidMount () {
@@ -77,13 +79,38 @@ class Main extends Component{
     }
 
     handleTrain = () => {
-        const { seriesX, seriesY } = this.state
+        const { training, seriesX, seriesY, seriesXForPrediction } = this.state
 
-        train(seriesX,seriesY)
+        if(training)
+            return false
+
+        this.setState({
+            training: true
+        })
+
+        const trainings = []
+
+        for(let i = 0; i < 100; i++){
+            trainings.push(
+                () => new Promise(resolve => {
+                    train(seriesX,seriesY)
+                        .then(() => {
+                            if(seriesXForPrediction.length > 0){
+                                this.handlePredict()
+                                delay(100)
+                                    .then(resolve)
+                            }
+                        })
+                })
+            )
+        }
+
+        trainings.reduce((prev, cur) => prev.then(cur), new Promise(resolve => { resolve() }))
             .then(() => {
                 this.setState({
                     training: false
                 })
+                console.log('training end')
             })
     }
 
