@@ -5,6 +5,7 @@ import { predict, train } from '../helpers/Intelligence'
 import { delay } from '../helpers/Utility'
 
 import SeriesInput from '../components/SeriesInput'
+import NumericInput from '../components/NumericInput'
 import Button from '../components/PnPButton'
 import Chart from '../components/Chart'
 
@@ -18,10 +19,11 @@ class Main extends Component{
         predictionData: [],
         seriesX: [],
         seriesY: [],
-        seriesXForPrediction: [1,6],
+        seriesXForPrediction: [],
         seriesYForPrediction: [],
         training: false,
-        trainingLoop: 0
+        trainingLoop: 0,
+        interactions: 10
     }
 
     componentDidMount () {
@@ -46,16 +48,18 @@ class Main extends Component{
     }
 
     drawPredictionChart = (seriesXForPrediction = this.state.seriesXForPrediction, seriesYForPrediction = this.state.seriesYForPrediction) => {
-        if(seriesXForPrediction.length !== seriesYForPrediction.length)
-            return false
+
+        const { seriesX } = this.state
+
+        const series = seriesXForPrediction.length > 0
+                        ? seriesXForPrediction
+                        : [seriesX[0],seriesX[seriesX.length - 1]]
 
         let predictionData = []
-        for(let i = 0; i < seriesXForPrediction.length; i++)
-            predictionData.push({ x: seriesXForPrediction[i], y: seriesYForPrediction[i] })
+        for(let i = 0; i < series.length; i++)
+            predictionData.push({ x: series[i], y: seriesYForPrediction[i] })
 
-        this.setState({
-            predictionData
-        })
+        this.setState({ predictionData })
     }
 
     handleChangeSeriesX = seriesX => {
@@ -72,51 +76,52 @@ class Main extends Component{
         this.drawChart(undefined,seriesY)
     }
 
-    handleChangeSeriesXForPrediction = seriesXForPrediction => {
-        this.setState({
-            seriesXForPrediction
-        })
-    }
+    handleChangeSeriesXForPrediction = seriesXForPrediction =>
+        this.setState({ seriesXForPrediction })
+
+    handleChangeInteractions = interactions =>
+        this.setState({ interactions })
 
     handleTrain = () => {
-        const { training, seriesX, seriesY, seriesXForPrediction } = this.state
+        const {
+            training,
+            seriesX,
+            seriesY,
+            interactions
+        } = this.state
 
         if(training)
             return false
 
-        this.setState({
-            training: true
-        })
+        this.setState({ training: true })
 
         const trainings = []
 
-        for(let i = 0; i < 100; i++){
+        for(let i = 0; i < interactions; i++){
             trainings.push(
                 () => new Promise(resolve => {
                     train(seriesX,seriesY)
                         .then(() => {
-                            if(seriesXForPrediction.length > 0){
-                                this.handlePredict()
-                                delay(100)
-                                    .then(resolve)
-                            }
+                            this.handlePredict()
+                            delay(100)
+                                .then(resolve)
                         })
                 })
             )
         }
 
-        trainings.reduce((prev, cur) => prev.then(cur), new Promise(resolve => { resolve() }))
-            .then(() => {
-                this.setState({
-                    training: false
-                })
-                console.log('training end')
-            })
+        trainings.reduce((prev, cur) => prev.then(cur), new Promise(resolve => resolve()))
+            .then(() => this.setState({ training: false }))
     }
 
     handlePredict = () => {
-        const { seriesXForPrediction } = this.state
-        predict(seriesXForPrediction)
+        const { seriesX, seriesXForPrediction } = this.state
+
+        const series = seriesXForPrediction.length > 0
+                        ? seriesXForPrediction
+                        : [seriesX[0],seriesX[seriesX.length - 1]]
+
+        predict(series)
             .then(seriesYForPrediction => {
                 this.setState({
                     seriesYForPrediction
@@ -127,7 +132,7 @@ class Main extends Component{
 
     render () {
 
-        const { chartData, predictionData, training } = this.state
+        const { chartData, predictionData, training, interactions } = this.state
 
         return (
             <div>
@@ -143,6 +148,11 @@ class Main extends Component{
                             name="Serie Y"
                             placeholder={ placeholderSerieY }
                             onChangeSeries={ this.handleChangeSeriesY }
+                            />
+                        <NumericInput
+                            name="Interactions"
+                            value={ interactions }
+                            onChangeValue={ this.handleChangeInteractions }
                             />
                         <div className={ "series-action" + ( training ? ' loading ' : '' ) }>
                             <Button

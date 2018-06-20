@@ -6,7 +6,8 @@ import {
     YAxis,
     VerticalGridLines,
     HorizontalGridLines,
-    LineMarkSeries
+    LineMarkSeries,
+    MarkSeries
 } from 'react-vis'
 import '../../node_modules/react-vis/dist/style.css'
 
@@ -29,9 +30,8 @@ const predictionGradient = (
             id="prediction-gradient-chart"
             gradientUnits="userSpaceOnUse"
             x1="0" y1="0" x2="200" y2="200" >
-            <stop offset="0%" stopColor="#03001e" />
-            <stop offset="50%" stopColor="#7303c0" />
-            <stop offset="100%" stopColor="#7303c0" />
+            <stop offset="0%" stopColor="#bc4e9c" />
+            <stop offset="100%" stopColor="#f80759" />
         </linearGradient>
     </GradientDefs>
 )
@@ -48,9 +48,8 @@ const Chart = ({ data, predictionData = [] }) => {
             <HorizontalGridLines />
             <XAxis />
             <YAxis />
-            <LineMarkSeries
+            <MarkSeries
                 color={'url(#gradient-chart)'}
-                curve={ 'curveMonotoneX' }
                 animation
                 data={ data } />
             {
