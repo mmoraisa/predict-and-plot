@@ -41,6 +41,11 @@ h1 {
     flex: 4;
 }
 
+.content > .function > .function-header {
+    display: flex;
+    align-items: center;
+}
+
 @media screen and (max-width: 768px) {
 
     .content {

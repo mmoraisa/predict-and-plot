@@ -15,6 +15,11 @@ export const train = (seriesX,seriesY) => {
     })
 }
 
-export const predict = () => {
-    model.predict(tf.tensor2d([5], [1, 1])).print();
-}
+export const predict = (seriesXForPredict) => new Promise(resolve => {
+
+    if(seriesXForPredict.length === 0)
+        resolve([])
+
+    model.predict(tf.tensor2d(seriesXForPredict, [seriesXForPredict.length, 1]))
+        .data().then(resolve)
+})

@@ -18,11 +18,11 @@ class SeriesInput extends Component {
         const {
             name,
             placeholder = [],
-            onChangeSeries = () => {}
+            style = []
         } = this.props
 
         return (
-            <div className="series-input">
+            <div className="series-input" style={ style }>
                 <span className="name">{ name }</span>
                 <div className="value">
                     <input

@@ -2,19 +2,23 @@ import React, { Component } from 'react'
 import './Main.css'
 
 import { predict, train } from '../helpers/Intelligence'
-import { delay } from '../helpers/Utility'
 
 import SeriesInput from '../components/SeriesInput'
 import Button from '../components/PnPButton'
+import Chart from '../components/Chart'
 
 const placeholderSerieX = [1,2,3,4,5];
-const placeholderSerieY = [5,32,6,1,2];
+const placeholderSerieY = [5,32,6,45,2];
 
 class Main extends Component{
 
     state = {
+        chartData: [],
+        predictionData: [],
         seriesX: [],
         seriesY: [],
+        seriesXForPrediction: [],
+        seriesYForPrediction: [],
         training: false
     }
 
@@ -23,17 +27,52 @@ class Main extends Component{
             seriesX: placeholderSerieX,
             seriesY: placeholderSerieY,
         })
+        this.drawChart(placeholderSerieX,placeholderSerieY)
+    }
+
+    drawChart = (seriesX = this.state.seriesX, seriesY = this.state.seriesY) => {
+        if(seriesX.length !== seriesY.length)
+            return false
+
+        let chartData = []
+        for(let i = 0; i < seriesX.length; i++)
+            chartData.push({ x: seriesX[i], y: seriesY[i] })
+
+        this.setState({
+            chartData
+        })
+    }
+
+    drawPredictionChart = (seriesXForPrediction = this.state.seriesXForPrediction, seriesYForPrediction = this.state.seriesYForPrediction) => {
+        if(seriesXForPrediction.length !== seriesYForPrediction.length)
+            return false
+
+        let predictionData = []
+        for(let i = 0; i < seriesXForPrediction.length; i++)
+            predictionData.push({ x: seriesXForPrediction[i], y: seriesYForPrediction[i] })
+
+        this.setState({
+            predictionData
+        })
     }
 
     handleChangeSeriesX = seriesX => {
         this.setState({
             seriesX
         })
+        this.drawChart(seriesX)
     }
 
     handleChangeSeriesY = seriesY => {
         this.setState({
             seriesY
+        })
+        this.drawChart(undefined,seriesY)
+    }
+
+    handleChangeSeriesXForPrediction = seriesXForPrediction => {
+        this.setState({
+            seriesXForPrediction
         })
     }
 
@@ -41,9 +80,6 @@ class Main extends Component{
         const { seriesX, seriesY } = this.state
 
         train(seriesX,seriesY)
-            .then(console.log)
-
-        delay(3000)
             .then(() => {
                 this.setState({
                     training: false
@@ -52,12 +88,19 @@ class Main extends Component{
     }
 
     handlePredict = () => {
-        predict()
+        const { seriesXForPrediction } = this.state
+        predict(seriesXForPrediction)
+            .then(seriesYForPrediction => {
+                this.setState({
+                    seriesYForPrediction
+                })
+                this.drawPredictionChart(undefined,seriesYForPrediction)
+            })
     }
 
     render () {
 
-        const { training } = this.state
+        const { chartData, predictionData, training } = this.state
 
         return (
             <div>
@@ -80,14 +123,24 @@ class Main extends Component{
                                 disabled={ training } >
                                 Train Model
                             </Button>
-                            <img src="img/loading.svg" />
+                            <img alt="loading" src="img/loading.svg" />
                         </div>
                     </section>
                     <section className="function">
-                        <Button
-                            onClick={ this.handlePredict } >
-                            Predict
-                        </Button>
+                        <div className="function-header">
+                            <SeriesInput
+                                name="X for prediction"
+                                placeholder={ [] }
+                                onChangeSeries={ this.handleChangeSeriesXForPrediction }
+                                />
+                            <Button
+                                onClick={ this.handlePredict } >
+                                Predict
+                            </Button>
+                        </div>
+                        <Chart
+                            data={ chartData }
+                            predictionData={ predictionData } />
                     </section>
                 </div>
             </div>
