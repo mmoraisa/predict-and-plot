@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import './Main.css'
 
+import { predict, train } from '../helpers/Intelligence'
+import { delay } from '../helpers/Utility'
+
 import SeriesInput from '../components/SeriesInput'
 import Button from '../components/PnPButton'
 
@@ -12,6 +15,7 @@ class Main extends Component{
     state = {
         seriesX: [],
         seriesY: [],
+        training: false
     }
 
     componentDidMount () {
@@ -33,7 +37,28 @@ class Main extends Component{
         })
     }
 
+    handleTrain = () => {
+        const { seriesX, seriesY } = this.state
+
+        train(seriesX,seriesY)
+            .then(console.log)
+
+        delay(3000)
+            .then(() => {
+                this.setState({
+                    training: false
+                })
+            })
+    }
+
+    handlePredict = () => {
+        predict()
+    }
+
     render () {
+
+        const { training } = this.state
+
         return (
             <div>
                 <h1>Predict&Plot</h1>
@@ -49,14 +74,21 @@ class Main extends Component{
                             placeholder={ placeholderSerieY }
                             onChangeSeries={ this.handleChangeSeriesY }
                             />
-                        <div className="series-action">
-                            <Button>
-                                Treinar Modelo
+                        <div className={ "series-action" + ( training ? ' loading ' : '' ) }>
+                            <Button
+                                onClick={ this.handleTrain }
+                                disabled={ training } >
+                                Train Model
                             </Button>
                             <img src="img/loading.svg" />
                         </div>
                     </section>
-                    <section className="function"></section>
+                    <section className="function">
+                        <Button
+                            onClick={ this.handlePredict } >
+                            Predict
+                        </Button>
+                    </section>
                 </div>
             </div>
         )
